@@ -9,7 +9,7 @@ import (
 	"runtime"
 
 	"github.com/goinline/agent"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func getHandlerName(handler echo.HandlerFunc) string {
