@@ -40,7 +40,7 @@ func getCallName(skip int) (callerName string) {
 	return
 }
 
-type hook struct {
+type Hooks struct {
 	host string
 }
 
