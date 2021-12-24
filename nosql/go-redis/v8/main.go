@@ -5,7 +5,6 @@ package redis
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"sync"
 	"time"
