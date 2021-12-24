@@ -275,7 +275,6 @@ func DBExecContext(db *sql.DB, ctx context.Context, query string, args ...interf
 
 //go:noinline
 func WrapDBExecContext(db *sql.DB, ctx context.Context, query string, args ...interface{}) (sql.Result, error) {
-
 	recursiveChecker := &recursiveCheck{rlsID: 2, success: false}
 
 	begin, enter := recursiveChecker.enter()

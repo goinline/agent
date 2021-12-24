@@ -44,12 +44,14 @@ type hook struct {
 	host string
 }
 
-func (h *hook) BeforeProcess(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
+var _ redis.Hook = Hooks{}
+
+func (h Hooks) BeforeProcess(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
 	tingyun3.LocalSet(9, &processContext{time.Now(), cmd.Name()})
 	return ctx, nil
 }
 
-func (h *hook) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
+func (h Hooks) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
 	if c := tingyun3.LocalDelete(9); c != nil {
 		if info, ok := c.(*processContext); ok {
 			handleGoRedis(h.host, cmd.Args(), info.begin, cmd.Err(), 2)
@@ -58,14 +60,14 @@ func (h *hook) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
 	return nil
 }
 
-func (h *hook) BeforeProcessPipeline(ctx context.Context, cmds []redis.Cmder) (context.Context, error) {
+func (h Hooks) BeforeProcessPipeline(ctx context.Context, cmds []redis.Cmder) (context.Context, error) {
 	if len(cmds) > 0 {
 		tingyun3.LocalSet(9, &processContext{time.Now(), cmds[0].Name()})
 	}
 	return ctx, nil
 }
 
-func (h *hook) AfterProcessPipeline(ctx context.Context, cmds []redis.Cmder) error {
+func (h Hooks) AfterProcessPipeline(ctx context.Context, cmds []redis.Cmder) error {
 	if c := tingyun3.LocalDelete(9); c != nil {
 		if info, ok := c.(*processContext); ok {
 			handleGoRedis(h.host, cmds[0].Args(), info.begin, nil, 2)
@@ -199,6 +201,32 @@ func WrapbaseClientgeneralProcessPipeline(c *baseClient, ctx context.Context, cm
 	return e
 }
 
+//go:noinline
+func redisNewClusterClient(opt *redis.ClusterOptions) *redis.ClusterClient {
+	trampoline.arg10 = *trampoline.idpointer + trampoline.idindex + trampoline.arg1 + trampoline.arg2 + trampoline.arg3 + trampoline.arg4 + trampoline.arg5 + trampoline.arg6 + trampoline.arg7 +
+		trampoline.arg8 + trampoline.arg9 + trampoline.arg10 + trampoline.arg11 + trampoline.arg12 + trampoline.arg13 + trampoline.arg14 + trampoline.arg15 + trampoline.arg16 +
+		trampoline.arg17 + trampoline.arg18 + trampoline.arg19 + trampoline.arg20
+	return nil
+}
+
+//go:noinline
+func WrapredisNewClusterClient(opt *redis.ClusterOptions) *redis.ClusterClient {
+	r := redisNewClusterClient(opt)
+	if r == nil {
+		return r
+	}
+	addr := ""
+	if len(opt.Addrs) == 0 {
+		addr = "[]"
+	} else if len(opt.Addrs) == 1 {
+		addr = "[" + opt.Addrs[0] + "]"
+	} else {
+		addr = "[" + opt.Addrs[0] + ",...]"
+	}
+	r.AddHook(Hooks{host: addr})
+	return r
+}
+
 type clusterClient struct {
 	opt           *redis.ClusterOptions
 	nodes         *uint64
@@ -275,10 +303,6 @@ func WrapClusterClient_processTxPipeline(c *ClusterClient, ctx context.Context, 
 	return e
 }
 
-type Hooks struct {
-	hooks []interface{}
-}
-
 type instanceSet struct {
 	lock  sync.RWMutex
 	items map[*redis.Client]string
@@ -313,6 +337,7 @@ func init() {
 	tingyun3.Register(reflect.ValueOf(WrapbaseClientprocess).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapbaseClientprocessPipeline).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapbaseClientgeneralProcessPipeline).Pointer())
+	tingyun3.Register(reflect.ValueOf(WrapredisNewClusterClient).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapClusterClient_processPipeline).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapClusterClient_processTxPipeline).Pointer())
 	tingyun3.Register(reflect.ValueOf(initTrampoline).Pointer())
