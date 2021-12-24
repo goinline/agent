@@ -131,8 +131,10 @@ extern const WrapItem* TingyunWraps() {
         {"github.com/kataras/iris/v12/core/router.(*APIBuilder).CreateRoutes", "/frameworks/iris/v12.", "irisCreateRoutes"},
         {"github.com/kataras/iris/v12/core/router.FileServer", "/frameworks/iris/v12.", "routerFileServer"},
 
+        {"github.com/go-redis/redis/v7.NewClient", "/nosql/go-redis/v7.", "redisNewClient"},
         {"github.com/go-redis/redis/v7.NewClusterClient", "/nosql/go-redis/v7.", "redisNewClusterClient"},
 
+        {"github.com/go-redis/redis/v8.NewClient", "/nosql/go-redis/v8.", "redisNewClient"},
         {"github.com/go-redis/redis/v8.NewClusterClient", "/nosql/go-redis/v8.", "redisNewClusterClient"},
 
         {0, 0, 0}

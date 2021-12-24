@@ -202,6 +202,25 @@ func WrapbaseClientgeneralProcessPipeline(c *baseClient, ctx context.Context, cm
 }
 
 //go:noinline
+func redisNewClient(opt *redis.Options) *redis.Client {
+	trampoline.arg9 = *trampoline.idpointer + trampoline.idindex + trampoline.arg1 + trampoline.arg2 + trampoline.arg3 + trampoline.arg4 + trampoline.arg5 + trampoline.arg6 + trampoline.arg7 +
+		trampoline.arg8 + trampoline.arg9 + trampoline.arg10 + trampoline.arg11 + trampoline.arg12 + trampoline.arg13 + trampoline.arg14 + trampoline.arg15 + trampoline.arg16 +
+		trampoline.arg17 + trampoline.arg18 + trampoline.arg19 + trampoline.arg20
+	return nil
+}
+
+//go:noinline
+func WrapredisNewClient(opt *redis.Options) *redis.Client {
+	r := redisNewClient(opt)
+	if r == nil {
+		return nil
+	}
+	addr := opt.Addr
+	r.AddHook(Hooks{host: addr})
+	return r
+}
+
+//go:noinline
 func redisNewClusterClient(opt *redis.ClusterOptions) *redis.ClusterClient {
 	trampoline.arg10 = *trampoline.idpointer + trampoline.idindex + trampoline.arg1 + trampoline.arg2 + trampoline.arg3 + trampoline.arg4 + trampoline.arg5 + trampoline.arg6 + trampoline.arg7 +
 		trampoline.arg8 + trampoline.arg9 + trampoline.arg10 + trampoline.arg11 + trampoline.arg12 + trampoline.arg13 + trampoline.arg14 + trampoline.arg15 + trampoline.arg16 +
@@ -337,6 +356,7 @@ func init() {
 	tingyun3.Register(reflect.ValueOf(WrapbaseClientprocess).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapbaseClientprocessPipeline).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapbaseClientgeneralProcessPipeline).Pointer())
+	tingyun3.Register(reflect.ValueOf(WrapredisNewClient).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapredisNewClusterClient).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapClusterClient_processPipeline).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapClusterClient_processTxPipeline).Pointer())
