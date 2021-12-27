@@ -1,6 +1,5 @@
 // Copyright 2021 冯立强 fenglq@tingyun.com.  All rights reserved.
-// +build darwin
-// +build windows
+// +build !linux
 
 package tingyun3
 
