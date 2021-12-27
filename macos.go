@@ -9,8 +9,6 @@ import (
 	"strings"
 )
 
-import "C"
-
 func GetGID() int64 {
 	buffer := make([]byte, 32)
 	runtime.Stack(buffer, false)
