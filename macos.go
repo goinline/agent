@@ -1,5 +1,5 @@
 // Copyright 2021 冯立强 fenglq@tingyun.com.  All rights reserved.
-// +build !linux
+// +build !linux !cgo
 
 package tingyun3
 
