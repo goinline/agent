@@ -1,6 +1,7 @@
 // Copyright 2021 冯立强 fenglq@tingyun.com.  All rights reserved.
 // +build linux
 // +build amd64
+// +build cgo
 
 package beegoframe
 
@@ -11,9 +12,9 @@ import (
 
 	"github.com/beego/beego/server/web/context"
 
-	"github.com/goinline/agent"
 	beego "github.com/beego/beego/server/web"
 	param "github.com/beego/beego/server/web/context/param"
+	"github.com/goinline/agent"
 )
 
 const (
