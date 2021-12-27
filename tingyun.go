@@ -2,6 +2,4 @@
 
 package tingyun3
 
-import "C"
-
 const TINGYUN_GO_AGENT_VERSION = "v1.0.0"
