@@ -70,7 +70,7 @@ func (h Hooks) BeforeProcessPipeline(ctx context.Context, cmds []redis.Cmder) (c
 	if ctx == nil {
 		return ctx, nil
 	}
-	return context.WithValue(ctx, "TingYunPipeCtx", &processContext{time.Now(), cmd[0].Name()}), nil
+	return context.WithValue(ctx, "TingYunPipeCtx", &processContext{time.Now(), cmds[0].Name()}), nil
 }
 
 func (h Hooks) AfterProcessPipeline(ctx context.Context, cmds []redis.Cmder) error {
