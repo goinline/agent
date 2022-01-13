@@ -127,6 +127,7 @@ func (a *application) createAction(category string, method string) (*Action, err
 	action.root.tracerID = action.makeTracerID()
 	action.cache.Init()
 	action.errors.Init()
+	action.callbacks.Init()
 	action.time.Init()
 	action.cache.Put(action.root)
 
