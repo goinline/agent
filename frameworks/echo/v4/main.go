@@ -47,10 +47,10 @@ func echoEchoAdd(ptr *echo.Echo, method, path string, handler echo.HandlerFunc, 
 
 //go:noinline
 func WrapechoEchoAdd(ptr *echo.Echo, method, path string, handler echo.HandlerFunc, middleware ...echo.MiddlewareFunc) *echo.Route {
-	tingyun3.LocalSet(9+8, "handled")
+	tingyun3.LocalSet(StorageIndexEcho, "handled")
 	wrapper := wrapHandler(method, path, handler)
 	r := echoEchoAdd(ptr, method, path, wrapper, middleware...)
-	tingyun3.LocalDelete(9 + 8)
+	tingyun3.LocalDelete(StorageIndexEcho)
 	return r
 }
 

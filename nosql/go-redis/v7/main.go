@@ -33,6 +33,17 @@ var skipTokens = []string{
 	"github.com/goinline/agent",
 }
 
+func readConfigInt(name string, defaultValue int) int {
+	v, exist := tingyun3.ConfigRead(name)
+	if !exist {
+		return defaultValue
+	}
+	if value, ok := v.(int64); ok {
+		return int(value)
+	}
+	return defaultValue
+}
+
 //go:noinline
 func getCallName(skip int) (callerName string) {
 	skip++
@@ -63,9 +74,14 @@ func (h Hooks) BeforeProcess(ctx context.Context, cmd redis.Cmder) (context.Cont
 		return ctx, nil
 	}
 	if pctx := ctx.Value("TingYunGoRedisCtx"); pctx != nil {
+		if info, ok := pctx.(*processContext); ok {
+			if info.cmd == cmdProcessHook {
+				info.layer++
+			}
+		}
 		return ctx, nil
 	}
-	return context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdProcessHook}), nil
+	return context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdProcessHook, 0}), nil
 }
 
 func (h Hooks) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
@@ -75,6 +91,10 @@ func (h Hooks) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
 	if pctx := ctx.Value("TingYunGoRedisCtx"); pctx != nil {
 		if info, ok := pctx.(*processContext); ok {
 			if info.cmd != cmdProcessHook {
+				return nil
+			}
+			if info.layer != 0 {
+				info.layer--
 				return nil
 			}
 			c, object := parseCmder(cmd)
@@ -89,9 +109,19 @@ func (h Hooks) BeforeProcessPipeline(ctx context.Context, cmds []redis.Cmder) (c
 		return ctx, nil
 	}
 	if pctx := ctx.Value("TingYunGoRedisCtx"); pctx != nil {
+		if info, ok := pctx.(*processContext); ok {
+			if info.cmd == cmdProcessPipeHook {
+				info.layer++
+			}
+		}
 		return ctx, nil
 	}
-	return context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdProcessPipeHook}), nil
+	configFlag := readConfigInt("go-redis.flag", 0)
+
+	if (configFlag&1) == 0 && tingyun3.MatchCallerName(3, "github.com/go-redis/redis/v8.(*clusterStateHolder).LazyReload.func1") {
+		return ctx, nil
+	}
+	return context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdProcessPipeHook, 0}), nil
 }
 
 func (h Hooks) AfterProcessPipeline(ctx context.Context, cmds []redis.Cmder) error {
@@ -101,6 +131,10 @@ func (h Hooks) AfterProcessPipeline(ctx context.Context, cmds []redis.Cmder) err
 	if pctx := ctx.Value("TingYunGoRedisCtx"); pctx != nil {
 		if info, ok := pctx.(*processContext); ok {
 			if info.cmd != cmdProcessPipeHook {
+				return nil
+			}
+			if info.layer != 0 {
+				info.layer--
 				return nil
 			}
 			cmd, object := parseCmders(cmds)
@@ -113,6 +147,7 @@ func (h Hooks) AfterProcessPipeline(ctx context.Context, cmds []redis.Cmder) err
 type processContext struct {
 	begin time.Time
 	cmd   int
+	layer int
 }
 
 var objectSkipList = []string{
@@ -240,7 +275,7 @@ func WrapbaseClientprocess(c *baseClient, ctx context.Context, cmd redis.Cmder) 
 			}
 		}()
 	}
-	ctx = context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdbaseClientprocess})
+	ctx = context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdbaseClientprocess, 0})
 
 	err = baseClientprocess(c, ctx, cmd)
 	return err
@@ -277,7 +312,7 @@ func WrapbaseClientprocessPipeline(c *baseClient, ctx context.Context, cmds []re
 			}
 		}()
 	}
-	ctx = context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdbaseClientprocessPipeline})
+	ctx = context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdbaseClientprocessPipeline, 0})
 
 	e = baseClientprocessPipeline(c, ctx, cmds)
 	return e
@@ -317,7 +352,7 @@ func WrapbaseClientgeneralProcessPipeline(c *baseClient, ctx context.Context, cm
 			}
 		}()
 	}
-	ctx = context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdbaseClientgeneralProcessPipeline})
+	ctx = context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdbaseClientgeneralProcessPipeline, 0})
 
 	e = baseClientgeneralProcessPipeline(c, ctx, cmds, p)
 	return e
@@ -421,7 +456,7 @@ func WrapClusterClient_processPipeline(c *ClusterClient, ctx context.Context, cm
 			}
 		}()
 	}
-	ctx = context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdClusterClient_processPipeline})
+	ctx = context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdClusterClient_processPipeline, 0})
 	e = ClusterClient_processPipeline(c, ctx, cmds)
 	return e
 }
@@ -466,7 +501,7 @@ func WrapClusterClient_processTxPipeline(c *ClusterClient, ctx context.Context, 
 			}
 		}()
 	}
-	ctx = context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdClusterClient_processTxPipeline})
+	ctx = context.WithValue(ctx, "TingYunGoRedisCtx", &processContext{time.Now(), cmdClusterClient_processTxPipeline, 0})
 	e = ClusterClient_processTxPipeline(c, ctx, cmds)
 	return e
 }

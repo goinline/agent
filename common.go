@@ -21,6 +21,34 @@ func GetCallerName(layer int) string {
 	return ""
 }
 
+//go:noinline
+func GetRootCallerName(layer int) string {
+	var pc uintptr = 0
+	for {
+		if addr, _, _, success := runtime.Caller(layer); success {
+			pc = addr
+			layer++
+		}
+	}
+	if pc != 0 {
+		return runtime.FuncForPC(pc).Name()
+	}
+	return ""
+}
+
+//go:noinline
+func MatchCallerName(layer int, funcname string) bool {
+	for {
+		if addr, _, _, success := runtime.Caller(layer); success {
+			if runtime.FuncForPC(addr).Name() == funcname {
+				return true
+			}
+			layer++
+		}
+	}
+	return false
+}
+
 // GetCallerPC return caller pc
 //go:noinline
 func GetCallerPC(layer int) (l int, pc uintptr) {
