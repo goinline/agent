@@ -68,8 +68,6 @@ type Hooks struct {
 	host string
 }
 
-var _ redis.Hook = Hooks{}
-
 func (h Hooks) BeforeProcess(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
 	if ctx == nil {
 		return ctx, nil
