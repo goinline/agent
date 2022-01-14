@@ -27,11 +27,11 @@ type handlerInfo struct {
 	isFunc bool
 }
 
-var tempVar = 0x1234567890
-
 //go:noinline
 func beegoAddMethod(p *beego.ControllerRegister, method, pattern string, f beego.FilterFunc) {
-	tempVar += 10
+	trampoline.arg1 = trampoline.idindex + trampoline.arg1 + trampoline.arg2 + trampoline.arg3 + trampoline.arg4 + trampoline.arg5 + trampoline.arg6 + trampoline.arg7 +
+		trampoline.arg8 + trampoline.arg9 + trampoline.arg10 + trampoline.arg11 + trampoline.arg12 + trampoline.arg13 + trampoline.arg14 + trampoline.arg15 + trampoline.arg16 +
+		trampoline.arg17 + trampoline.arg18 + trampoline.arg19 + trampoline.arg20
 }
 
 var methodMap = map[string]string{
@@ -53,14 +53,24 @@ func WrapbeegoAddMethod(p *beego.ControllerRegister, method, pattern string, f b
 		name:   methodName,
 		isFunc: true,
 	}
+	pre := tingyun3.LocalGet(StorageIndexBeego)
 	tingyun3.LocalSet(StorageIndexBeego, info)
-	defer tingyun3.LocalDelete(StorageIndexBeego)
+
+	defer func() {
+		if pre == nil {
+			tingyun3.LocalDelete(StorageIndexBeego)
+		} else {
+			tingyun3.LocalSet(StorageIndexBeego, pre)
+		}
+	}()
 	beegoAddMethod(p, method, pattern, f)
 }
 
 //go:noinline
 func beegoHandler(p *beego.ControllerRegister, pattern string, h http.Handler, options ...interface{}) {
-	tempVar += 10
+	trampoline.arg1 = trampoline.idindex + trampoline.arg1 + trampoline.arg2 + trampoline.arg3 + trampoline.arg4 + trampoline.arg5 + trampoline.arg6 + trampoline.arg7 +
+		trampoline.arg8 + trampoline.arg9 + trampoline.arg10 + trampoline.arg11 + trampoline.arg12 + trampoline.arg13 + trampoline.arg14 + trampoline.arg15 + trampoline.arg16 +
+		trampoline.arg17 + trampoline.arg18 + trampoline.arg19 + trampoline.arg20
 }
 
 //go:noinline
@@ -77,14 +87,23 @@ func WrapbeegoHandler(p *beego.ControllerRegister, pattern string, h http.Handle
 		info.method = "ServeHTTP"
 		info.isFunc = false
 	}
+	pre := tingyun3.LocalGet(StorageIndexBeego)
 	tingyun3.LocalSet(StorageIndexBeego, info)
-	defer tingyun3.LocalDelete(StorageIndexBeego)
+	defer func() {
+		if pre == nil {
+			tingyun3.LocalDelete(StorageIndexBeego)
+		} else {
+			tingyun3.LocalSet(StorageIndexBeego, pre)
+		}
+	}()
 	beegoHandler(p, pattern, h, options...)
 }
 
 //go:noinline
 func beegoaddWithMethodParams(p *beego.ControllerRegister, pattern string, c beego.ControllerInterface, methodParams []*param.MethodParam, mappingMethods ...string) {
-	tempVar += 10
+	trampoline.arg1 = trampoline.idindex + trampoline.arg1 + trampoline.arg2 + trampoline.arg3 + trampoline.arg4 + trampoline.arg5 + trampoline.arg6 + trampoline.arg7 +
+		trampoline.arg8 + trampoline.arg9 + trampoline.arg10 + trampoline.arg11 + trampoline.arg12 + trampoline.arg13 + trampoline.arg14 + trampoline.arg15 + trampoline.arg16 +
+		trampoline.arg17 + trampoline.arg18 + trampoline.arg19 + trampoline.arg20
 }
 
 //go:noinline
@@ -94,14 +113,24 @@ func WrapbeegoaddWithMethodParams(p *beego.ControllerRegister, pattern string, c
 		name:   reflect.Indirect(reflectVal).Type().String(),
 		isFunc: false,
 	}
+	pre := tingyun3.LocalGet(StorageIndexBeego)
 	tingyun3.LocalSet(StorageIndexBeego, info)
-	defer tingyun3.LocalDelete(StorageIndexBeego)
+	defer func() {
+		if pre == nil {
+			tingyun3.LocalDelete(StorageIndexBeego)
+		} else {
+			tingyun3.LocalSet(StorageIndexBeego, pre)
+		}
+	}()
+
 	beegoaddWithMethodParams(p, pattern, c, methodParams, mappingMethods...)
 }
 
 //go:noinline
 func beegoAddAutoPrefix(p *beego.ControllerRegister, prefix string, c beego.ControllerInterface) {
-	tempVar += 10
+	trampoline.arg1 = trampoline.idindex + trampoline.arg1 + trampoline.arg2 + trampoline.arg3 + trampoline.arg4 + trampoline.arg5 + trampoline.arg6 + trampoline.arg7 +
+		trampoline.arg8 + trampoline.arg9 + trampoline.arg10 + trampoline.arg11 + trampoline.arg12 + trampoline.arg13 + trampoline.arg14 + trampoline.arg15 + trampoline.arg16 +
+		trampoline.arg17 + trampoline.arg18 + trampoline.arg19 + trampoline.arg20
 }
 
 //go:noinline
@@ -111,8 +140,15 @@ func WrapbeegoAddAutoPrefix(p *beego.ControllerRegister, prefix string, c beego.
 		name:   reflect.Indirect(reflectVal).Type().String(),
 		isFunc: false,
 	}
+	pre := tingyun3.LocalGet(StorageIndexBeego)
+	defer func() {
+		if pre == nil {
+			tingyun3.LocalDelete(StorageIndexBeego)
+		} else {
+			tingyun3.LocalSet(StorageIndexBeego, pre)
+		}
+	}()
 	tingyun3.LocalSet(StorageIndexBeego, info)
-	defer tingyun3.LocalDelete(StorageIndexBeego)
 	beegoAddAutoPrefix(p, prefix, c)
 }
 
@@ -120,7 +156,9 @@ var routeMap map[string]bool = nil
 
 //go:noinline
 func beegoaddToRouter(p *beego.ControllerRegister, method, pattern string, r *beego.ControllerInfo) {
-	tempVar += 10
+	trampoline.arg1 = trampoline.idindex + trampoline.arg1 + trampoline.arg2 + trampoline.arg3 + trampoline.arg4 + trampoline.arg5 + trampoline.arg6 + trampoline.arg7 +
+		trampoline.arg8 + trampoline.arg9 + trampoline.arg10 + trampoline.arg11 + trampoline.arg12 + trampoline.arg13 + trampoline.arg14 + trampoline.arg15 + trampoline.arg16 +
+		trampoline.arg17 + trampoline.arg18 + trampoline.arg19 + trampoline.arg20
 }
 
 //go:noinline

@@ -746,7 +746,7 @@ func LocalGet(id int) interface{} {
 		if localStorage == nil {
 			return nil
 		}
-		if localStorage.pointers == nil {
+		if localStorage.pointers != nil {
 			if r, found := localStorage.pointers[id]; found {
 				res = r
 			}
