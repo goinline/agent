@@ -40,6 +40,9 @@ func GetRootCallerName(layer int) string {
 func MatchCallerName(layer int, funcname string) bool {
 	for {
 		if addr, _, _, success := runtime.Caller(layer); success {
+			if addr == 0 {
+				break
+			}
 			if runtime.FuncForPC(addr).Name() == funcname {
 				return true
 			}
