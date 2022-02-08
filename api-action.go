@@ -101,11 +101,18 @@ func (a *Action) CreateExternalComponent(url string, method string) *Component {
 	} else if tystring.SubString(url, 0, 7) == "http://" {
 		protocol = "http"
 	}
+	urlRequest := parseUriRequest(parseURI(url))
+	if len(urlRequest) == 0 {
+		urlRequest = "/"
+	} else if len(urlRequest) > 1 && urlRequest[0] == '/' {
+		urlRequest = urlRequest[1:]
+	}
 	c := &Component{
 		action:         a,
 		instance:       url,
 		method:         method,
 		protocol:       protocol,
+		op:             urlRequest,
 		tracerParentID: a.current.tracerID,
 		tracerID:       a.makeTracerID(),
 		exID:           false,
