@@ -1,5 +1,5 @@
 // +build linux
-// +build amd64
+// +build amd64 arm64
 // +build cgo
 
 package redis
@@ -163,7 +163,6 @@ func handleGoRedis(ctx context.Context, host, cmd, object string, begin time.Tim
 	callerName := ""
 	if action == nil {
 		callerName = getCallName(3)
-		tingyun3.Log().Println(tingyun3.LevelDebug, callerName, " action not found, create task")
 		if action, _ = tingyun3.CreateTask(callerName); action != nil {
 			action.FixBegin(begin)
 			defer func() {
