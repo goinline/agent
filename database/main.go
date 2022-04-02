@@ -83,7 +83,6 @@ func (d *dbinstanceSet) defaultDBInfo() (*databaseInfo, string) {
 		for dsn, _ := range dsns {
 			r := &databaseInfo{}
 			r.init(v, dsn)
-			fmt.Println("Got Default dsn")
 			return r, "Got vender by guess."
 		}
 	}
