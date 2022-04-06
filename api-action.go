@@ -176,7 +176,7 @@ func getRedisInstanceName(host, key string) string {
 	redisUseKey := int(readLocalConfigInteger(configLocalIntegerRedisInstanceUseKey, 0))
 	if key[0] == '[' {
 		if (redisUseKey & 2) == 0 {
-			return host + "/[]"
+			return host
 		}
 	} else {
 		if (redisUseKey & 1) == 0 {
