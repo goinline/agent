@@ -195,6 +195,7 @@ func (a *Action) CreateRedisComponent(host, cmd, key, method string) *Component 
 		return nil
 	}
 	key = getValidString(key, "NULL")
+
 	c := &Component{
 		action:         a,
 		method:         method,
