@@ -39,7 +39,7 @@ func appendAction(action *Action) {
 	}
 }
 func readServerConfigInt(id int, defaultValue int) int {
-	if app == nil {
+	if app == nil || !app.inited {
 		return defaultValue
 	}
 	return int(app.configs.serverExt.CIntegers.Read(id, int64(defaultValue)))
@@ -97,9 +97,13 @@ func (a *application) init(configfile string) (*application, error) {
 		a.svc.Start(a.loop)
 	}
 	a.logger.Println(log.LevelInfo, "App Init by ", configfile)
+	a.inited = true
 	return a, nil
 }
 func (a *application) createAction(category string, method string, istask bool) (*Action, error) {
+	if a == nil || !a.inited {
+		return nil, errors.New("Agent not inited")
+	}
 	if enabled := readServerConfigBool(configServerConfigBoolAgentEnabled, true); !enabled {
 		return nil, errors.New("Agent disabled by server config")
 	}
@@ -150,4 +154,5 @@ type application struct {
 	serverCtrl  serverControl
 	reportQueue list.List
 	Runtime     runtimePerf
+	inited      bool
 }
