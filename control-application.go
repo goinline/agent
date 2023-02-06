@@ -34,7 +34,7 @@ const (
 //actionPool里的请求归纳处理
 func (a *application) parseActions(parseMax int) int {
 	actionParsed := 0
-	report_max := int(app.configs.local.CIntegers.Read(configLocalIntegerNbsActionReportMax, 5000))
+	report_max := int(a.configs.local.CIntegers.Read(configLocalIntegerNbsActionReportMax, 5000))
 	saveCount := int(a.configs.local.CIntegers.Read(configLocalIntegerNbsSaveCount, 10))
 	if saveCount < 1 {
 		saveCount = 1
@@ -75,6 +75,7 @@ type serverControl struct {
 	loginState        uint8
 	postIsReturn      bool
 	requestLoginReset bool
+	login_time        int64
 }
 
 func (s *serverControl) Pushback(eventCallback func()) {
@@ -101,6 +102,7 @@ func (s *serverControl) OnReturn() {
 
 func (s *serverControl) init() {
 	s.loginState = serverUnInited
+	s.login_time = 0
 	s.postIsReturn = false
 	s.finishedPool.Init()
 }
@@ -205,6 +207,7 @@ func (a *application) startLogin() {
 			}
 			a.server.lastAlive = time.Now()
 			a.serverCtrl.loginState = serverLoginSuccess
+			a.serverCtrl.login_time++
 		}
 	})
 	if err != nil {
@@ -317,7 +320,7 @@ func (a *application) upload() {
 }
 
 func (a *application) loop(running func() bool) {
-	init_delay := app.configs.local.CIntegers.Read(configLocalIntegerAgentInitDelay, 1)
+	init_delay := a.configs.local.CIntegers.Read(configLocalIntegerAgentInitDelay, 1)
 	time.Sleep(time.Second * time.Duration(init_delay))
 	lastParsed := 1
 	sleepDuration := time.Millisecond

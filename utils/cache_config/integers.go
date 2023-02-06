@@ -39,7 +39,7 @@ func (s *Integers) Find(id int) (int64, bool) {
 	if s == nil || !s.inited || !in_range(id, s.item_count) || !in_range(s.current, 4) {
 		return -1, false
 	}
-	item := &s.arrays[s.current][id]
+	item := &s.arrays[s.current%4][id]
 	if item.used {
 		return item.value, true
 	}

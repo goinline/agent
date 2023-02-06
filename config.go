@@ -33,7 +33,8 @@ const (
 	configLocalBoolTransactionEnabled     = 5
 	configLocalBoolGormEnabled            = 6
 	configLocalBoolWarningDBInfo          = 7
-	configLocalBoolMax                    = 8
+	configLocalBoolGorillaWebsocket       = 8
+	configLocalBoolMax                    = 16
 	configLocalIntegerNbsPort             = 1
 	configLocalIntegerNbsSaveCount        = 2
 	configLocalIntegerNbsMaxLogSize       = log.ConfigIntegerNBSMaxLogSize
@@ -131,6 +132,7 @@ var localBoolKeyMap = map[string]int{
 	"transaction_enabled": configLocalBoolTransactionEnabled,
 	"GORM_ENABLED":        configLocalBoolGormEnabled,
 	"WARNING_DBINFO":      configLocalBoolWarningDBInfo,
+	"gorilla.websocket":   configLocalBoolGorillaWebsocket,
 }
 
 var localIntegerKeyMap = map[string]int{
