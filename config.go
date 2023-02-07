@@ -46,6 +46,7 @@ const (
 	configLocalIntegerMaxSQLSize          = 9
 	configLocalIntegerGoRedisFLAG         = 10
 	configLocalIntegerRedisInstanceUseKey = 11
+	ConfigLocalIntegerWebsocketIgnore     = 12
 	configLocalIntegerMax                 = 16
 
 	configServerStringAppSessionKey     = 1
@@ -153,6 +154,7 @@ var localIntegerKeyMap = map[string]int{
 	"go-redis.flag":         configLocalIntegerGoRedisFLAG,
 	"agent_sql_size_max":    configLocalIntegerMaxSQLSize,
 	"REDIS_INST_USE_KEY":    configLocalIntegerRedisInstanceUseKey,
+	"websocket.ignore":      ConfigLocalIntegerWebsocketIgnore,
 }
 
 var serverStringKeyMap = map[string]int{

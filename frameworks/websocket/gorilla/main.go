@@ -9,6 +9,7 @@ import (
 	"io"
 	"reflect"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/websocket"
 
@@ -56,8 +57,13 @@ func onWebsocketTaskEnd() {
 	if component := tingyun3.GetComponent(); component != nil {
 		component.Finish()
 	}
-	action.SetStatusCode(0)
-	action.Finish()
+	igonre_duration := tingyun3.ReadLocalConfigInteger(tingyun3.ConfigLocalIntegerWebsocketIgnore, 0)
+	if action.Duration() < time.Duration(igonre_duration)*time.Millisecond {
+		action.Ignore()
+	} else {
+		action.SetStatusCode(1)
+		action.Finish()
+	}
 	tingyun3.LocalClear()
 }
 func getWebsockType(messageType int) string {
