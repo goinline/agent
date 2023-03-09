@@ -71,6 +71,9 @@ type Action struct {
 }
 
 func (a *Action) IsTask() bool {
+	if a == nil {
+		return false
+	}
 	return a.isTask
 }
 func (a *Action) checkComponent() bool {
@@ -648,6 +651,9 @@ func (a *Action) SetStatusCode(code uint16) int {
 
 //FixBegin : 内部使用, 重置事务开始时间
 func (a *Action) FixBegin(begin time.Time) {
+	if a == nil {
+		return
+	}
 	a.time.begin = begin
 }
 
@@ -854,6 +860,12 @@ func LocalDelete(id int) interface{} {
 		return local
 	})
 	return res
+}
+func (a *Action) GetTransactionID() string {
+	if a == nil {
+		return ""
+	}
+	return a.getTransactionID()
 }
 
 // GetComponent : 辅助功能函数: 将存储到协程局部存储器的组件对象取出
