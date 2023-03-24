@@ -220,7 +220,7 @@ func (p *runtimeBlock) Serialize() ([]byte, error) {
 	ret[19] = metricValue("Memory/Stack/StackInuse", &p.StackInuse)
 	ret[20] = metricValue("Memory/MSpan/MSpanInuse", &p.MSpanInuse)
 	ret[21] = metricValue("Memory/MCache/MCacheInuse", &p.MCacheInuse)
-	ret[22] = metricValue("Process/NULL/FD", &p.FDSize)
+	ret[22] = metricValue("FD/NULL/Count", &p.FDSize)
 	ret[23] = metricValue("Thread/NULL/Count", &p.Threads)
 	return json.Marshal(ret)
 }
