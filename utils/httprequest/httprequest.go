@@ -103,7 +103,7 @@ func New(url string, params map[string]string, data []byte, duration time.Durati
 		client := &http.Client{Timeout: duration}
 		defer func() {
 			if exception := recover(); exception != nil {
-				fmt.Println(exception)
+				// fmt.Println(exception)
 			}
 			if request.Body != nil && request.Body != http.NoBody {
 				request.Body.Close()
