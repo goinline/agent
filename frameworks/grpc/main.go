@@ -71,7 +71,9 @@ func wrapMethodsHandler(serviceName, className, methodName string, handler func(
 					action.AddRequestParam(item, value)
 				}
 			}
-			action.SetURL("grpc://" + serviceName + "/" + className + "/" + methodName)
+			reqUrl := "grpc://" + serviceName + "/" + className + "/" + methodName
+			action.SetURL(reqUrl)
+
 			tingyun3.SetAction(action)
 
 			ctx = context.WithValue(ctx, "TingYunWebAction", action)
@@ -124,7 +126,8 @@ func wrapStreamsHandler(serviceName, className, methodName string, handler grpc.
 					action.AddRequestParam(item, value)
 				}
 			}
-			action.SetURL("grpc://" + serviceName + "/" + className + "/" + methodName)
+			reqUrl := "grpc://" + serviceName + "/" + className + "/" + methodName
+			action.SetURL(reqUrl)
 			tingyun3.SetAction(action)
 		}
 		defer func() {
