@@ -171,6 +171,7 @@ extern const WrapItem* TingyunWraps() {
         {"github.com/kataras/iris/v12/core/router.FileServer", "/frameworks/iris/v12.", "routerFileServer"},
 
         {"google.golang.org/grpc.(*Server).RegisterService", "/frameworks/grpc.", "ServerRegisterService"},
+        {"google.golang.org/grpc.(*Server).Serve", "/frameworks/grpc.", "ServerServe"},
         {"google.golang.org/grpc.(*ClientConn).Invoke", "/frameworks/grpc.", "ClientConnInvoke"},
         {"google.golang.org/grpc.(*ClientConn).NewStream", "/frameworks/grpc.", "ClientConnNewStream"},
 

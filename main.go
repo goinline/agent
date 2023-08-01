@@ -495,6 +495,10 @@ func HttpServerServe(srv *http.Server, l net.Listener) error {
 	return nil
 }
 
+func AppendListenAddress(address string) {
+	listens.Append(address)
+}
+
 //go:noinline
 func WrapHttpServerServe(srv *http.Server, l net.Listener) error {
 	addr := srv.Addr

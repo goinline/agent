@@ -45,8 +45,7 @@ func parseIP(addr string) string {
 	}
 	return addr
 }
-
-func wrapMethodsHandler(className, methodName string, handler func(interface{}, context.Context, func(interface{}) error, grpc.UnaryServerInterceptor) (interface{}, error)) func(interface{}, context.Context, func(interface{}) error, grpc.UnaryServerInterceptor) (interface{}, error) {
+func wrapMethodsHandler(serviceName, className, methodName string, handler func(interface{}, context.Context, func(interface{}) error, grpc.UnaryServerInterceptor) (interface{}, error)) func(interface{}, context.Context, func(interface{}) error, grpc.UnaryServerInterceptor) (interface{}, error) {
 	wrapper := func(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 
 		md, _ := metadata.FromIncomingContext(ctx)
@@ -71,6 +70,7 @@ func wrapMethodsHandler(className, methodName string, handler func(interface{}, 
 					action.AddRequestParam(item, value)
 				}
 			}
+			action.SetURL("grpc://" + serviceName + "/" + className + "/" + methodName)
 			tingyun3.SetAction(action)
 
 			ctx = context.WithValue(ctx, "TingYunWebAction", action)
@@ -97,8 +97,7 @@ func wrapMethodsHandler(className, methodName string, handler func(interface{}, 
 	return wrapper
 }
 
-func wrapStreamsHandler(className, methodName string, handler grpc.StreamHandler) grpc.StreamHandler {
-
+func wrapStreamsHandler(serviceName, className, methodName string, handler grpc.StreamHandler) grpc.StreamHandler {
 	wrapper := func(srv interface{}, stream grpc.ServerStream) error {
 
 		ctx := stream.Context()
@@ -124,7 +123,7 @@ func wrapStreamsHandler(className, methodName string, handler grpc.StreamHandler
 					action.AddRequestParam(item, value)
 				}
 			}
-
+			action.SetURL("grpc://" + serviceName + "/" + className + "/" + methodName)
 			tingyun3.SetAction(action)
 		}
 		defer func() {
@@ -155,13 +154,30 @@ func WrapServerRegisterService(s *grpc.Server, sd *grpc.ServiceDesc, ss interfac
 	className := getHandlerName(ss)
 
 	for id, _ := range sd.Methods {
-		sd.Methods[id].Handler = wrapMethodsHandler(className, sd.Methods[id].MethodName, sd.Methods[id].Handler)
+		sd.Methods[id].Handler = wrapMethodsHandler(sd.ServiceName, className, sd.Methods[id].MethodName, sd.Methods[id].Handler)
 	}
 
 	for id, _ := range sd.Streams {
-		sd.Streams[id].Handler = wrapStreamsHandler(className, sd.Streams[id].StreamName, sd.Streams[id].Handler)
+		sd.Streams[id].Handler = wrapStreamsHandler(sd.ServiceName, className, sd.Streams[id].StreamName, sd.Streams[id].Handler)
 	}
 	ServerRegisterService(s, sd, ss)
+}
+
+//go:noinline
+func ServerServe(s *grpc.Server, lis net.Listener) error {
+	trampoline.arg1 = *trampoline.idpointer + trampoline.idindex + trampoline.arg1 + trampoline.arg2 + trampoline.arg3 + trampoline.arg4 + trampoline.arg5 + trampoline.arg6 + trampoline.arg7 +
+		trampoline.arg8 + trampoline.arg9 + trampoline.arg10 + trampoline.arg11 + trampoline.arg12 + trampoline.arg13 + trampoline.arg14 + trampoline.arg15 + trampoline.arg16 +
+		trampoline.arg17 + trampoline.arg18 + trampoline.arg19 + trampoline.arg20
+	return nil
+}
+
+//go:noinline
+func WrapServerServe(s *grpc.Server, lis net.Listener) error {
+	addr := lis.Addr().String()
+	if len(addr) > 0 {
+		tingyun3.AppendListenAddress(addr)
+	}
+	return ServerServe(s, lis)
 }
 
 func getHandlerName(ss interface{}) string {
@@ -212,21 +228,24 @@ func ClientConnInvoke(cc *grpc.ClientConn, ctx context.Context, method string, a
 func WrapClientConnInvoke(cc *grpc.ClientConn, ctx context.Context, method string, args, reply interface{}, opts ...grpc.CallOption) error {
 
 	var component *tingyun3.Component = (*tingyun3.Component)(nil)
-	callerName := getCallName(2)
-
-	url := "grpc://" + cc.Target()
-	if url[len(url)-1] != '/' {
-		url += "/"
-	}
-	if len(method) > 0 {
-		uri := method
-		if uri[0] == '/' {
-			uri = uri[1:]
-		}
-		url += uri
-	}
+	callerName := ""
+	url := ""
+	target := ""
 
 	if action, _ := tingyun3.FindAction(ctx); action != nil {
+		callerName = getCallName(2)
+		target = cc.Target()
+		url = "grpc://" + target
+		if url[len(url)-1] != '/' {
+			url += "/"
+		}
+		if len(method) > 0 {
+			uri := method
+			if uri[0] == '/' {
+				uri = uri[1:]
+			}
+			url += uri
+		}
 		component = action.CreateExternalComponent(url, callerName)
 	}
 
@@ -234,12 +253,9 @@ func WrapClientConnInvoke(cc *grpc.ClientConn, ctx context.Context, method strin
 		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("X-Tingyun", trackID))
 	}
 
-	var ret error = nil
 	if component == nil {
-		ret = ClientConnInvoke(cc, ctx, method, args, reply, opts...)
-		return ret
+		return ClientConnInvoke(cc, ctx, method, args, reply, opts...)
 	}
-	target := cc.Target()
 	if len(target) > 0 {
 		component.SetURL(url)
 	}
@@ -252,7 +268,7 @@ func WrapClientConnInvoke(cc *grpc.ClientConn, ctx context.Context, method strin
 		}
 	}()
 
-	ret = ClientConnInvoke(cc, ctx, method, args, reply, opts...)
+	ret := ClientConnInvoke(cc, ctx, method, args, reply, opts...)
 
 	if ret != nil {
 		component.SetException(ret, callerName+"("+method+")", 3)
@@ -274,28 +290,38 @@ func ClientConnNewStream(cc *grpc.ClientConn, ctx context.Context, desc *grpc.St
 func WrapClientConnNewStream(cc *grpc.ClientConn, ctx context.Context, desc *grpc.StreamDesc, method string, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 
 	var component *tingyun3.Component = (*tingyun3.Component)(nil)
-	callerName := getCallName(2)
+	callerName := ""
+	url := ""
+	target := ""
 
 	if action, _ := tingyun3.FindAction(ctx); action != nil {
-		component = action.CreateExternalComponent(method, callerName)
+		callerName = getCallName(2)
+		target = cc.Target()
+		url = "grpc://" + target
+		if url[len(url)-1] != '/' {
+			url += "/"
+		}
+		if len(method) > 0 {
+			uri := method
+			if uri[0] == '/' {
+				uri = uri[1:]
+			}
+			url += uri
+		}
+		component = action.CreateExternalComponent(url, callerName)
 	}
-
-	var ret error = nil
-	var cs grpc.ClientStream = nil
 
 	if component == nil {
-
-		cs, ret = ClientConnNewStream(cc, ctx, desc, method, opts...)
-
-		if cs != nil {
-			cs = &ClientStreamWrapper{
-				component,
-				cs,
-			}
-		}
-		return cs, ret
+		return ClientConnNewStream(cc, ctx, desc, method, opts...)
 	}
-	component.SetURL(cc.Target())
+
+	if trackID := component.CreateTrackID(); len(trackID) > 0 {
+		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("X-Tingyun", trackID))
+	}
+
+	if len(target) > 0 {
+		component.SetURL(url)
+	}
 
 	defer func() {
 		if exception := recover(); exception != nil {
@@ -305,7 +331,7 @@ func WrapClientConnNewStream(cc *grpc.ClientConn, ctx context.Context, desc *grp
 		}
 	}()
 
-	cs, ret = ClientConnNewStream(cc, ctx, desc, method, opts...)
+	cs, ret := ClientConnNewStream(cc, ctx, desc, method, opts...)
 
 	if ret != nil {
 		component.SetException(ret, callerName+"("+method+")", 3)
@@ -359,6 +385,7 @@ func (w *ClientStreamWrapper) RecvMsg(m interface{}) error {
 
 func init() {
 	tingyun3.Register(reflect.ValueOf(WrapServerRegisterService).Pointer())
+	tingyun3.Register(reflect.ValueOf(WrapServerServe).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapClientConnInvoke).Pointer())
 	tingyun3.Register(reflect.ValueOf(WrapClientConnNewStream).Pointer())
 	tingyun3.Register(reflect.ValueOf(initTrampoline).Pointer())
