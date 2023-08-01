@@ -44,8 +44,8 @@ func WrapTransportHttpContextMiddleware(c *wrapper, h middleware.Handler) middle
 
 		return r
 	}
-	callerName := tingyun3.GetCallerName(2)
-	className := reflect.TypeOf(r).String()
+	//callerName := tingyun3.GetCallerName(2)
+	//className := reflect.TypeOf(r).String()
 	tyWrapper := func(ctx context.Context, req interface{}) (interface{}, error) {
 
 		action := tingyun3.GetAction()
