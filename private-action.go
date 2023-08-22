@@ -48,10 +48,15 @@ func (a *Action) unicID() string {
 	return a.actionID
 }
 func (a *Action) getTransactionID() string {
-	if _, transactionID := a.parseTrackID(); len(transactionID) > 0 {
-		return transactionID
+	if len(a.transagentID) == 0 {
+
+		if _, transactionID := a.parseTrackID(); len(transactionID) > 0 {
+			a.transagentID = transactionID
+		} else {
+			a.transagentID = a.unicID()
+		}
 	}
-	return a.unicID()
+	return a.transagentID
 }
 
 func (a *Action) parseTrackID() (callList, transactionID string) {
