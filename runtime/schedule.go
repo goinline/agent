@@ -5,12 +5,6 @@
 
 package wrapruntime
 
-import (
-	"fmt"
-	"runtime"
-
-	"github.com/goinline/agent"
-)
 
 //go:noinline
 func runtimeSchedule() {
@@ -21,27 +15,6 @@ func runtimeSchedule() {
 
 //go:noinline
 func WrapruntimeSchedule() {
-
-	stackList := [8]uintptr{0, 0, 0, 0, 0, 0, 0, 0}
-	count := runtime.Callers(1, stackList[:8])
-	out := false
-	for i := 0; i < count; i++ {
-		name, file := getnameByAddr(stackList[i] - 1)
-		if name == "runtime.main" {
-			out = true
-			fmt.Println("Routine:", tingyun3.GetGID())
-		}
-		if out {
-			fmt.Println(i, name+":"+file)
-		}
-	}
 	runtimeSchedule()
 }
-func getnameByAddr(p uintptr) (string, string) {
-	if r := runtime.FuncForPC(p); r == nil {
-		return "", ""
-	} else {
-		file, line := r.FileLine(p)
-		return r.Name(), fmt.Sprintf("%s:%d", file, line)
-	}
-}
+

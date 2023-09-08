@@ -143,5 +143,5 @@ func GetTrackToken() (string, string) {
 	traceId := action.getTransactionID()
 	actionId := action.unicID()
 	tagName := readLocalConfigString(configLocalStringLogTrackName, "tingyun")
-	return tagName, fmt.Sprintf("tingyun_app_id:%d,tingyun_trace_id:%s,tingyun_span_id:%s", appId, traceId, actionId)
+	return tagName, fmt.Sprintf("[tingyun_app_id:%d,tingyun_trace_id:%s,tingyun_span_id:%s]", appId, traceId, actionId)
 }

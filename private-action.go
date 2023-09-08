@@ -3,7 +3,6 @@
 package tingyun3
 
 import (
-	"fmt"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -151,13 +150,11 @@ func namingParseURIPartName(uriRule, uri string) string {
 func namingCustomizeNameByRule(rule *nameRule, r *http.Request) string {
 
 	if !rule.Valid() {
-		fmt.Println("No rule")
 		return ""
 	}
 	//匹配 HTTP Method
 	if rule.matchRule.methodMatch != 0 {
 		if caseCMP(rule.matchRule.MethodEnabled(), r.Method) != 0 {
-			fmt.Println("Not Match method")
 			return ""
 		}
 	}
@@ -165,7 +162,6 @@ func namingCustomizeNameByRule(rule *nameRule, r *http.Request) string {
 	if len(rule.matchRule.uriMatchTarget) > 0 {
 
 		if !namingMatchTargetValue(rule.matchRule.howToMatchURI, rule.matchRule.uriMatchTarget, r.URL.Path) {
-			fmt.Println("uri match failed")
 			return ""
 		}
 	}
@@ -206,17 +202,14 @@ func namingCustomizeNameByRule(rule *nameRule, r *http.Request) string {
 			v := getQuery().Get(paramMatch.paramName)
 
 			if !namingMatchParamValue(paramMatch.howToMatchParam, paramMatch.matchTarget, v) {
-				fmt.Println("param match failed")
 				return ""
 			}
 		} else if paramMatch.matchType == 2 {
 			v := r.Header.Get(paramMatch.paramName)
 			if !namingMatchParamValue(paramMatch.howToMatchParam, paramMatch.matchTarget, v) {
-				fmt.Println("header match failed")
 				return ""
 			}
 		} else {
-			fmt.Println("unsupported matchType", paramMatch.matchType)
 			return ""
 		}
 	}

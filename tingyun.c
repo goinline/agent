@@ -16,9 +16,10 @@ extern const ReplaceItem* TingyunReplaceItems() {
     static ReplaceItem targets[] = {
 
      {"runtime.(*_type).string", "/runtime.WrapTypeString", "", "/runtime.TypeString"},
+     {"runtime.rtype.string", "/runtime.WrapTypeString", "", "/runtime.TypeString"},
      {"runtime.chansend", "/runtime.Wrapchansend", "", "/runtime.chansend"},
      {"runtime.selectgo", "/runtime.Wrapselectgo", "", "/runtime.selectgo"},
-//     {"runtime.chanrecv", "/runtime.Wrapchanrecv", "", "/runtime.chanrecv"},
+
      {"net/http.NotFound", ".WraphttpNotFound", "net/http", ".httpNotFound"},
      {"net/http.(*Server).Serve", ".WrapHttpServerServe", "", ".HttpServerServe"},
      {"net/http.(*ServeMux).Handle", ".WrapServerMuxHandle", "", ".ServerMuxHandle"},
@@ -163,7 +164,7 @@ extern const ReplaceItem* TingyunReplaceItems() {
 extern const WrapItem* TingyunWraps() {
     
     static WrapItem targets[] = {
-       {"runtime.chanrecv", "/runtime.", "chanrecv"},
+        {"runtime.chanrecv", "/runtime.", "chanrecv"},
         {"net/http.(*Transport).roundTrip", ".", "httpTransportroundTrip"},
         {"net/http/httputil.(*ReverseProxy).ServeHTTP", ".", "httputilReverseProxyServeHTTP"},
         {"database/sql.Open", "/database.", "DBOpen"},
