@@ -7,7 +7,6 @@ package redisv9
 import (
 	"context"
 	"reflect"
-	"runtime"
 	"time"
 
 	"github.com/goinline/agent/libs/tystring"

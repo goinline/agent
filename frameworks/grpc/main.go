@@ -10,7 +10,6 @@ import (
 	"io"
 	"net"
 	"reflect"
-	"runtime"
 
 	"github.com/goinline/agent"
 	"github.com/goinline/agent/libs/tystring"

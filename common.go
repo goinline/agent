@@ -105,7 +105,6 @@ func FindCallerName(skip int, tempStacks []uintptr, isNative func(string) bool) 
 	for i := 0; i < callerCount; i++ {
 		f := runtime.FuncForPC(callers[i] - 1)
 		callerName = f.Name()
-		fmt.Println("checknative: ", callerName)
 		if !isNative(callerName) {
 			return
 		}
